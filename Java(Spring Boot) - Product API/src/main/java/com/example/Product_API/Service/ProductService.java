@@ -1,10 +1,10 @@
 package com.example.Product_API.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.example.Product_API.Exceptions.ResourceNotFoundException;
 import com.example.Product_API.Model.Product;
 import com.example.Product_API.Repository.ProductRepository;
 
@@ -20,8 +20,9 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    public Optional<Product> getProductById(Long id) {
-        return productRepository.findById(id);
+    public Product getProductById(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
     }
 
     public Product createProduct(Product product) {
@@ -29,6 +30,9 @@ public class ProductService {
     }
 
     public void deleteProduct(Long id) {
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Product not found with id: " + id);
+        }
         productRepository.deleteById(id);
     }
 }
